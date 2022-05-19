@@ -7,6 +7,7 @@ App = {
         await App.loadAccount()
         await App.loadContract()
         await App.render()
+        web3.eth.defaultAccount = App.account;
     },
   
     loadWeb3: async () => {
@@ -46,10 +47,10 @@ App = {
     },
   
     loadContract: async () => {
-        const todoList = await $.getJSON('TodoList.json')
-        App.contracts.TodoList = TruffleContract(todoList)
+        const TodoList = await $.getJSON('TodoList.json')
+        App.contracts.TodoList = TruffleContract(TodoList)
         App.contracts.TodoList.setProvider(App.web3Provider)
-        App.todoList = await App.contracts.TodoList.deployed()
+        App.TodoList = await App.contracts.TodoList.deployed()
     },
   
     render: async () => {
@@ -68,12 +69,12 @@ App = {
   
     renderTasks: async () => {
 
-      const taskCount = await App.todoList.taskCount()
+      const taskCount = await App.TodoList.taskCount()
       const $taskTemplate = $('.taskTemplate')
 
       for (var i = 1; i <= taskCount; i++) {
 
-        const task = await App.todoList.tasks(i)
+        const task = await App.TodoList.tasks(i)
         const taskId = task[0].toNumber()
         const taskContent = task[1]
         const taskCompleted = task[2]
@@ -99,14 +100,14 @@ App = {
     createTask: async () => {
       App.setLoading(true)
       const content = $('#newTask').val()
-      await App.todoList.createTask(content)
+      await App.TodoList.createTask(content)
       window.location.reload()
     },
   
     toggleCompleted: async (e) => {
       App.setLoading(true)
       const taskId = e.target.name
-      await App.todoList.toggleCompleted(taskId)
+      await App.TodoList.toggleCompleted(taskId)
       window.location.reload()
     },
   
